@@ -13,6 +13,8 @@ from app.api.urls import router as url_router
 from app.api.analytics import router as analytics_router
 from app.api.dashboard import router as dashboard_router
 from app.middleware.logging import LoggingMiddleware
+from app.exceptions.handlers import register_exception_handlers
+
 
 ## Create database tables
 Base.metadata.create_all(bind=engine)
@@ -42,6 +44,7 @@ app = FastAPI(
 
 # Register middleware
 app.add_middleware(LoggingMiddleware)
+register_exception_handlers(app)
 
 # Health Check
 @app.get("/")
