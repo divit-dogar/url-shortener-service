@@ -18,6 +18,10 @@ from .url import (
     URLStats,
     URLUpdate,
 )
+from .analytics import (
+    ClickAnalyticsResponse,
+    URLAnalyticsResponse,
+)
 
 # Authentication Schemas
 from .auth import (

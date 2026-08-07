@@ -11,6 +11,7 @@ from app.core.database import get_db
 from app.dependencies import get_current_user
 from app.models import User
 from app.services.analytics_service import AnalyticsService
+from app.schemas import URLAnalyticsResponse
 
 router = APIRouter(
     prefix="/analytics",
@@ -20,6 +21,7 @@ router = APIRouter(
 
 @router.get(
     "/{short_code}",
+    response_model=URLAnalyticsResponse,
 )
 def get_url_analytics(
     short_code: str,
