@@ -57,3 +57,9 @@ class ShortURL(Base):
         "User",
         back_populates="urls",
     )
+
+    clicks = relationship(
+    "ClickAnalytics",
+    back_populates="short_url",
+    cascade="all, delete-orphan",
+    )
