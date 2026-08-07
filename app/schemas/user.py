@@ -4,9 +4,9 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
-# ==========================================================
+
 # User Registration Schema
-# ==========================================================
+
 class UserCreate(BaseModel):
     """
     Schema used while creating/registering a new user.
@@ -36,9 +36,9 @@ class UserCreate(BaseModel):
     )
 
 
-# ==========================================================
+
 # User Update Schema
-# ==========================================================
+
 class UserUpdate(BaseModel):
     """
     Schema used while updating user information.
@@ -54,9 +54,9 @@ class UserUpdate(BaseModel):
     )
 
 
-# ==========================================================
+
 # User Response Schema
-# ==========================================================
+
 class UserResponse(BaseModel):
     """
     Schema returned to the client.
