@@ -92,6 +92,7 @@ class URLService:
         self,
         url_id: int,
         url_data: URLUpdate,
+        user_id: int,
     ) -> URLResponse:
 
         url = self.url_repository.get_by_id(url_id)
@@ -99,6 +100,11 @@ class URLService:
         if not url:
             raise ValueError("URL not found.")
 
+        if url.user_id != user_id:
+            raise PermissionError(
+                "You are not authorized to update this URL."
+            )
+    
         if url_data.original_url:
             url.original_url = str(url_data.original_url)
 
@@ -114,6 +120,7 @@ class URLService:
     def delete_url(
         self,
         url_id: int,
+        user_id: int,
     ) -> None:
 
         url = self.url_repository.get_by_id(url_id)
@@ -121,6 +128,11 @@ class URLService:
         if not url:
             raise ValueError("URL not found.")
 
+        if url.user_id != user_id:
+            raise PermissionError(
+                "You are not authorized to delete this URL."
+            )
+    
         self.url_repository.delete(url)
 
     # Increment Click Count
