@@ -11,6 +11,7 @@ from app.core.database import Base, engine
 from app.api.auth import router as auth_router
 from app.api.urls import router as url_router
 from app.api.analytics import router as analytics_router
+from app.api.dashboard import router as dashboard_router
 
 ## Create database tables
 Base.metadata.create_all(bind=engine)
@@ -57,3 +58,4 @@ def root():
 app.include_router(auth_router)
 app.include_router(url_router)
 app.include_router(analytics_router)
+app.include_router(dashboard_router)
