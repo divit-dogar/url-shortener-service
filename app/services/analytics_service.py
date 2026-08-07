@@ -30,6 +30,7 @@ class AnalyticsService:
     def get_url_analytics(
         self,
         short_code: str,
+        user_id: int,
     ) -> dict:
        
        # Return analytics for a short URL.
@@ -42,6 +43,10 @@ class AnalyticsService:
         if not url:
             raise ValueError(
                 "URL not found."
+            )
+        if url.user_id != current_user.id:
+            raise PermissionError(
+                "You are not authorized to view this analytics."
             )
 
         total_clicks = (
