@@ -81,13 +81,6 @@ Windows
 ```bash
 venv\Scripts\activate
 ```
-
-Linux / Mac
-
-```bash
-source venv/bin/activate
-```
-
 Install dependencies
 
 ```bash
