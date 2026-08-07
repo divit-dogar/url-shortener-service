@@ -12,6 +12,7 @@ from app.api.auth import router as auth_router
 from app.api.urls import router as url_router
 from app.api.analytics import router as analytics_router
 from app.api.dashboard import router as dashboard_router
+from app.middleware.logging import LoggingMiddleware
 
 ## Create database tables
 Base.metadata.create_all(bind=engine)
@@ -32,16 +33,15 @@ def root():
         "message": "URL Shortener Service is running 🚀"
     }
 
-# Register Routers
-app.include_router(auth_router)
-
-
 # Create FastAPI application
 app = FastAPI(
     title="URL Shortener Service",
     description="A URL shortening service built with FastAPI",
     version="1.0.0",
 )
+
+# Register middleware
+app.add_middleware(LoggingMiddleware)
 
 # Health Check
 @app.get("/")
