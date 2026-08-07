@@ -8,6 +8,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.dependencies import get_current_user
+from app.models import User
 from app.schemas import URLCreate, URLResponse, URLUpdate
 from app.services.url_service import URLService
 
@@ -15,7 +17,6 @@ router = APIRouter(
     prefix="/urls",
     tags=["URLs"],
 )
-
 
 @router.post(
     "",
@@ -25,18 +26,17 @@ router = APIRouter(
 def create_url(
     url: URLCreate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    """
-    Create a shortened URL.
-    """
+    
+    # Create a shortened URL.
 
     service = URLService(db)
 
     try:
-        # Temporary user_id until JWT authentication is added
         return service.create_url(
             url_data=url,
-            user_id=1,
+            user_id=current_user.id,
         )
     except ValueError as exc:
         raise HTTPException(
@@ -52,10 +52,9 @@ def get_url(
     short_code: str,
     db: Session = Depends(get_db),
 ):
-    """
-    Retrieve original URL.
-    """
-
+    
+    # Retrieve original URL.
+    
     service = URLService(db)
 
     try:
@@ -75,11 +74,11 @@ def update_url(
     url_id: int,
     url: URLUpdate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    """
-    Update an existing short URL.
-    """
-
+    
+    # Update an existing short URL.
+    
     service = URLService(db)
 
     try:
@@ -101,10 +100,10 @@ def update_url(
 def delete_url(
     url_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    """
-    Delete a short URL.
-    """
+    
+    # Delete a short URL.
 
     service = URLService(db)
 
