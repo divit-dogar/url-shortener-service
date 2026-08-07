@@ -12,6 +12,8 @@ from app.dependencies import get_current_user
 from app.models import User
 from app.schemas import URLCreate, URLResponse, URLUpdate
 from app.services.url_service import URLService
+from fastapi import Request
+from fastapi.responses import RedirectResponse
 
 router = APIRouter(
     prefix="/urls",
@@ -50,6 +52,7 @@ def create_url(
 )
 def get_url(
     short_code: str,
+    request: Request,
     db: Session = Depends(get_db),
 ):
     
@@ -57,13 +60,19 @@ def get_url(
     
     service = URLService(db)
 
-    try:
-        return service.get_url(short_code)
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc),
-        )
+    url = service.get_url(short_code)
+
+    service.increment_clicks(
+        short_code=short_code,
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+        referrer=request.headers.get("referer"),
+    )
+
+    return RedirectResponse(
+        url=url.original_url,
+        status_code=307,
+    )
 
 
 @router.put(

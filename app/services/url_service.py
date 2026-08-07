@@ -18,6 +18,8 @@ from app.schemas import (
     URLResponse,
     URLUpdate,
 )
+from app.models import ClickAnalytics
+from app.repositories import AnalyticsRepository
 
 
 class URLService:
@@ -27,7 +29,8 @@ class URLService:
 
     def __init__(self, db: Session):
         self.url_repository = URLRepository(db)
-
+        self.analytics_repository = AnalyticsRepository(db)
+    
     # Generate Short Code
     
     def _generate_short_code(
@@ -140,6 +143,9 @@ class URLService:
     def increment_clicks(
         self,
         short_code: str,
+        ip_address: str | None = None,
+        user_agent: str | None = None,
+        referrer: str | None = None,
     ) -> None:
 
         url = self.url_repository.get_by_short_code(short_code)
@@ -147,4 +153,15 @@ class URLService:
         if not url:
             raise ValueError("URL not found.")
 
+        # Increment click count
         self.url_repository.increment_click_count(url)
+
+        # Save analytics
+        click = ClickAnalytics(
+            short_url_id=url.id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            referrer=referrer,
+        )
+
+        self.analytics_repository.create(click)
