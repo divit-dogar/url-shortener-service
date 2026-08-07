@@ -85,13 +85,13 @@ def update_url(
         return service.update_url(
             url_id=url_id,
             url_data=url,
+            user_id=current_user.id,
         )
-    except ValueError as exc:
+    except PermissionError as exc:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail=str(exc),
         )
-
 
 @router.delete(
     "/{url_id}",
@@ -108,9 +108,12 @@ def delete_url(
     service = URLService(db)
 
     try:
-        service.delete_url(url_id)
-    except ValueError as exc:
+        service.delete_url(
+            url_id=url_id,
+            user_id=current_user.id,
+        )
+    except PermissionError as exc:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail=str(exc),
         )
