@@ -32,7 +32,10 @@ def get_url_analytics(
     service = AnalyticsService(db)
 
     try:
-        return service.get_url_analytics(short_code)
+        return service.get_url_analytics(
+            short_code=short_code,
+            user_id=current_user.id,
+            )
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
