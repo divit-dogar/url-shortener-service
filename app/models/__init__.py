@@ -1,37 +1,15 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
+"""
+Model Package
 
-from app.core.database import Base
+Exports all database models.
+"""
 
+from .user import User
+from .short_url import ShortURL
+from .click_analytics import ClickAnalytics
 
-class ClickAnalytics(Base):
-    __tablename__ = "click_analytics"
-
-    # Primary Key
-    id = Column(Integer, primary_key=True, index=True)
-
-    # URL Relationship
-    short_url_id = Column(
-        Integer,
-        ForeignKey("short_urls.id"),
-        nullable=False,
-    )
-
-    # Analytics Information
-    ip_address = Column(String(45), nullable=True)
-
-    user_agent = Column(String(500), nullable=True)
-
-    referrer = Column(String(500), nullable=True)
-
-    clicked_at = Column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-    )
-
-    # Relationship
-    short_url = relationship(
-        "ShortURL",
-        back_populates="clicks",
-    )
+__all__ = [
+    "User",
+    "ShortURL",
+    "ClickAnalytics",
+]
