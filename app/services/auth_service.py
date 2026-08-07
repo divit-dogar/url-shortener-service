@@ -17,12 +17,11 @@ from app.core.security import (
 from app.models import User
 from app.repositories import UserRepository
 from app.schemas import (
-    LoginRequest,
     Token,
     UserCreate,
     UserResponse,
 )
-
+from fastapi.security import OAuth2PasswordRequestForm
 
 class AuthService:
     """
@@ -73,14 +72,14 @@ class AuthService:
 
    
     # Authenticate User
-    
+
     def login(
         self,
-        login_data: LoginRequest,
+        form_data: OAuth2PasswordRequestForm,
     ) -> Token:
 
         user = self.user_repository.get_by_email(
-            login_data.email
+            form_data.username
         )
 
         if user is None:
@@ -89,7 +88,7 @@ class AuthService:
             )
 
         if not verify_password(
-            login_data.password,
+            form_data.password,
             user.hashed_password,
         ):
             raise ValueError(
@@ -101,5 +100,6 @@ class AuthService:
         )
 
         return Token(
-            access_token=access_token
+            access_token=access_token,
+            token_type="bearer",
         )
