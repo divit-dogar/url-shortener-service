@@ -1,5 +1,5 @@
 from .conftest import client
-
+import uuid
 
 def test_create_url():
 
@@ -20,9 +20,12 @@ def test_create_url():
         },
         json={
             "original_url": "https://google.com",
-            "custom_alias": "pytest",
+            "custom_alias": f"pytest-{uuid.uuid4().hex[:6]}",
             "expires_at": None,
         },
     )
+
+    print(response.status_code)
+    print(response.json())
 
     assert response.status_code == 201
