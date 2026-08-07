@@ -28,3 +28,9 @@ class User(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+    urls = relationship(
+    "ShortURL",
+    back_populates="owner",
+    cascade="all, delete-orphan",
+    )
