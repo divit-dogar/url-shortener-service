@@ -8,6 +8,9 @@ engine = create_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,
 )
+print(f"Database URL: {settings.DATABASE_URL}")
+print(f"Engine URL: {engine.url}")
+
 
 # Create session factory
 SessionLocal = sessionmaker(
