@@ -44,7 +44,7 @@ class AnalyticsService:
             raise ValueError(
                 "URL not found."
             )
-        if url.user_id != current_user.id:
+        if url.user_id != user_id:
             raise PermissionError(
                 "You are not authorized to view this analytics."
             )
