@@ -9,7 +9,7 @@ from fastapi import FastAPI
 import app.models
 from app.core.database import Base, engine
 from app.api.auth import router as auth_router
-
+from app.api.urls import router as url_router
 
 ## Create database tables
 Base.metadata.create_all(bind=engine)
@@ -53,3 +53,5 @@ def root():
 
 # Register Routers
 app.include_router(auth_router)
+app.include_router(auth_router)
+app.include_router(url_router)
