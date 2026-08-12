@@ -56,24 +56,45 @@ class URLService:
         url_data: URLCreate,
         user_id: int,
     ) -> URLResponse:
+        """
+        Create a shortened URL.
 
-        # Use custom alias if provided
-        short_code = (
-            url_data.custom_alias
-            if url_data.custom_alias
-            else self._generate_short_code()
-        )
+        The short_code is always auto-generated.
+        custom_alias is optional and stored separately.
+        """
 
-        # Check duplicate short code
-        if self.url_repository.get_by_short_code(short_code):
-            raise ValueError("Short code already exists.")
+        # Check custom alias uniqueness
+        if url_data.custom_alias:
+
+            existing_alias = (
+                self.url_repository.get_by_custom_alias(
+                    url_data.custom_alias
+                )
+            )
+
+            if existing_alias:
+                raise ValueError(
+                    "Custom alias already exists."
+                )
+
+        # Generate short code
+        short_code = self._generate_short_code()
+
+        # Ensure generated short code is unique
+        while self.url_repository.get_by_short_code(
+            short_code
+        ):
+            short_code = self._generate_short_code()
 
         # Create database object
         short_url = ShortURL(
             original_url=str(url_data.original_url),
             short_code=short_code,
+            custom_alias=url_data.custom_alias,
             user_id=user_id,
             expires_at=url_data.expires_at,
+            is_active=True,
+            click_count=0,
         )
 
         # Save URL
@@ -82,7 +103,6 @@ class URLService:
         return URLResponse.model_validate(url)
 
     # Get URL By Short Code
-
     def get_url(
         self,
         short_code: str,

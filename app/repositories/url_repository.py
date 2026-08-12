@@ -46,6 +46,21 @@ class URLRepository:
             .first()
         )
 
+    # Get URL By Custom Alias
+
+    def get_by_custom_alias(
+        self,
+        custom_alias: str,
+    ) -> ShortURL | None:
+
+        return (
+            self.db.query(ShortURL)
+            .filter(
+                ShortURL.custom_alias == custom_alias
+            )
+            .first()
+        )
+
     # Get All URLs Created By User
 
     def get_by_user(

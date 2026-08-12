@@ -23,7 +23,7 @@ def test_get_analytics():
     }
 
     # Generate a unique alias for every test run
-    short_code = f"analytics-{uuid.uuid4().hex[:8]}"
+    custom_alias = f"analytics-{uuid.uuid4().hex[:8]}"
 
     # Create URL
     create_response = client.post(
@@ -31,13 +31,17 @@ def test_get_analytics():
         headers=headers,
         json={
             "original_url": "https://google.com",
-            "custom_alias": short_code,
+            "custom_alias": custom_alias,
             "expires_at": None,
         },
     )
 
     assert create_response.status_code == 201
 
+    # Get the AUTO-GENERATED short code from response
+    created_url = create_response.json()
+    short_code = created_url["short_code"]
+    
     # Visit short URL -> generates click event
     click_response = client.get(
         f"/{short_code}",
