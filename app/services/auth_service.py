@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.core.security import (
     create_access_token,
+    create_refresh_token,
     hash_password,
     verify_password,
 )
@@ -77,6 +78,10 @@ class AuthService:
         self,
         form_data: OAuth2PasswordRequestForm,
     ) -> Token:
+        """
+        Authenticate a user and return access
+        and refresh JWT tokens.
+        """
 
         user = self.user_repository.get_by_email(
             form_data.username
@@ -85,6 +90,11 @@ class AuthService:
         if user is None:
             raise ValueError(
                 "Invalid credentials."
+            )
+
+        if not user.is_active:
+            raise ValueError(
+                "User account is inactive."
             )
 
         if not verify_password(
@@ -99,7 +109,12 @@ class AuthService:
             subject=str(user.id)
         )
 
+        refresh_token = create_refresh_token(
+            subject=str(user.id)
+        )
+
         return Token(
             access_token=access_token,
+            refresh_token=refresh_token,
             token_type="bearer",
         )

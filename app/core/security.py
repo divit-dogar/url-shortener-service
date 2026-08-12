@@ -1,10 +1,8 @@
 """
 Security Module
 
-Purpose
--------
-Handles password hashing, JWT creation,
-JWT verification, and OAuth2 authentication.
+Handles password hashing,
+JWT creation, and JWT verification.
 """
 
 from datetime import datetime, timedelta, timezone
@@ -15,40 +13,29 @@ from passlib.context import CryptContext
 
 from app.core.config import settings
 
-# Password Hashing Configuration
-# CryptContext manages password hashing algorithms.
-# bcrypt is the industry standard for password hashing.
+
+# Password Hashing
+
 pwd_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto",
 )
 
-# Password Hashing
 
 def hash_password(password: str) -> str:
     """
-    Convert plain password into hashed password.
-
-    Example:
-    --------
-    divit@123
-
-    becomes
-
-    $2b$12$Jsd83k.....
+    Convert plain password into a secure hash.
     """
 
     return pwd_context.hash(password)
 
-# Password Verification
 
 def verify_password(
     plain_password: str,
     hashed_password: str,
 ) -> bool:
     """
-    Compare user entered password
-    with stored hashed password.
+    Verify a plain password against its hash.
     """
 
     return pwd_context.verify(
@@ -56,33 +43,33 @@ def verify_password(
         hashed_password,
     )
 
-# Create JWT Access Token
+
+# Create Access Token
 
 def create_access_token(
     subject: str,
     expires_delta: timedelta | None = None,
 ) -> str:
     """
-    Generate JWT access token.
-
-    Parameters
-    ----------
-    subject:
-        Usually User ID.
-
-    expires_delta:
-        Optional expiry duration.
+    Create a JWT access token.
     """
 
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = (
+            datetime.now(timezone.utc)
+            + expires_delta
+        )
     else:
-        expire = datetime.now(timezone.utc) + timedelta(
-            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+        expire = (
+            datetime.now(timezone.utc)
+            + timedelta(
+                minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+            )
         )
 
     payload: dict[str, Any] = {
         "sub": subject,
+        "type": "access",
         "exp": expire,
     }
 
@@ -92,13 +79,52 @@ def create_access_token(
         algorithm=settings.ALGORITHM,
     )
 
+
+# Create Refresh Token
+
+def create_refresh_token(
+    subject: str,
+    expires_delta: timedelta | None = None,
+) -> str:
+    """
+    Create a JWT refresh token.
+    """
+
+    if expires_delta:
+        expire = (
+            datetime.now(timezone.utc)
+            + expires_delta
+        )
+    else:
+        expire = (
+            datetime.now(timezone.utc)
+            + timedelta(
+                days=settings.REFRESH_TOKEN_EXPIRE_DAYS
+            )
+        )
+
+    payload: dict[str, Any] = {
+        "sub": subject,
+        "type": "refresh",
+        "exp": expire,
+    }
+
+    return jwt.encode(
+        payload,
+        settings.SECRET_KEY,
+        algorithm=settings.ALGORITHM,
+    )
+
+
 # Decode JWT
 
-
-def decode_access_token(token: str) -> dict[str, Any]:
+def decode_access_token(
+    token: str,
+) -> dict[str, Any]:
     """
-    Decode and verify JWT token.
-    Raises JWTError if token is invalid.
+    Decode and verify a JWT token.
+
+    Raises JWTError if invalid or expired.
     """
 
     return jwt.decode(

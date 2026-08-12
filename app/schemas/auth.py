@@ -29,13 +29,14 @@ class LoginRequest(BaseModel):
 # JWT Token Response
 
 class Token(BaseModel):
+
     """
     Response returned after
     successful authentication.
     """
 
     access_token: str
-
+    refresh_token: str
     token_type: str = "bearer"
 
 
