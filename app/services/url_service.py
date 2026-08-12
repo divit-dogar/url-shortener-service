@@ -20,7 +20,9 @@ from app.schemas import (
 )
 from app.models import ClickAnalytics
 from app.repositories import AnalyticsRepository
-
+from app.events.analytics_observer import AnalyticsObserver
+from app.events.click_event import ClickEvent
+from app.events.publisher import ClickEventPublisher
 
 class URLService:
     """
@@ -29,8 +31,12 @@ class URLService:
 
     def __init__(self, db: Session):
         self.url_repository = URLRepository(db)
-        self.analytics_repository = AnalyticsRepository(db)
-    
+
+        self.click_publisher = ClickEventPublisher()
+
+        self.click_publisher.subscribe(
+            AnalyticsObserver(db)
+        )
     # Generate Short Code
     
     def _generate_short_code(
@@ -148,20 +154,26 @@ class URLService:
         referrer: str | None = None,
     ) -> None:
 
-        url = self.url_repository.get_by_short_code(short_code)
+        url = self.url_repository.get_by_short_code(
+            short_code
+        )
 
         if not url:
             raise ValueError("URL not found.")
 
-        # Increment click count
-        self.url_repository.increment_click_count(url)
+        # Increment total click count
+        self.url_repository.increment_click_count(
+            url
+        )
 
-        # Save analytics
-        click = ClickAnalytics(
+        # Create click event
+        event = ClickEvent(
             short_url_id=url.id,
+            short_code=url.short_code,
             ip_address=ip_address,
             user_agent=user_agent,
             referrer=referrer,
         )
 
-        self.analytics_repository.create(click)
+        # Notify observers
+        self.click_publisher.notify(event)
