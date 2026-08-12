@@ -9,7 +9,11 @@ class ClickAnalytics(Base):
     __tablename__ = "click_analytics"
 
     # Primary Key
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True,
+    )
 
     # URL Relationship
     short_url_id = Column(
@@ -18,14 +22,39 @@ class ClickAnalytics(Base):
         nullable=False,
     )
 
-    # Analytics Information
-    ip_address = Column(String(45), nullable=True)
+    # Visitor Information
+    ip_address = Column(
+        String(100),
+        nullable=True,
+    )
 
-    user_agent = Column(String(500), nullable=True)
+    user_agent = Column(
+        String(500),
+        nullable=True,
+    )
 
-    referrer = Column(String(500), nullable=True)
+    browser = Column(
+        String(100),
+        nullable=True,
+    )
 
-    clicked_at = Column(
+    operating_system = Column(
+        String(100),
+        nullable=True,
+    )
+
+    device = Column(
+        String(100),
+        nullable=True,
+    )
+
+    referrer = Column(
+        String(500),
+        nullable=True,
+    )
+
+    # Visit Timestamp
+    visited_at = Column(
         DateTime(timezone=True),
         server_default=func.now(),
     )

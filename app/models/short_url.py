@@ -1,4 +1,5 @@
 from sqlalchemy import (
+    Boolean,
     Column,
     DateTime,
     ForeignKey,
@@ -27,6 +28,12 @@ class ShortURL(Base):
         index=True,
         nullable=False,
     )
+    custom_alias = Column(
+        String(50),
+        nullable=True,
+        unique=True,
+    )
+
 
     # Owner
     user_id = Column(
@@ -38,7 +45,15 @@ class ShortURL(Base):
     # Analytics
     click_count = Column(Integer, default=0)
 
-    expires_at = Column(DateTime(timezone=True), nullable=True)
+    expires_at = Column(
+        DateTime(timezone=True),
+        nullable=True,
+        )
+    is_active = Column(
+        Boolean,
+        default=True,
+        nullable=False,
+        )
 
     # Audit Fields
     created_at = Column(
