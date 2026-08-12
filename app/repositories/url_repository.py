@@ -150,6 +150,27 @@ class URLRepository:
 
         self.db.commit()
 
+    # Enable URL
+
+    def enable(self, short_url: ShortURL) -> ShortURL:
+        short_url.is_active = True
+
+        self.db.commit()
+        self.db.refresh(short_url)
+
+        return short_url
+
+
+    # Disable URL
+
+    def disable(self, short_url: ShortURL) -> ShortURL:
+        short_url.is_active = False
+
+        self.db.commit()
+        self.db.refresh(short_url)
+
+        return short_url
+
     # Delete URL
 
     def delete(self, short_url: ShortURL) -> None:

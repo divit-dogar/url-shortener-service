@@ -1,8 +1,8 @@
 """
 URL Service
 
-Purpose
--------
+## Purpose
+
 Contains business logic related
 to URL shortening operations.
 """
@@ -18,11 +18,10 @@ from app.schemas import (
     URLResponse,
     URLUpdate,
 )
-from app.models import ClickAnalytics
-from app.repositories import AnalyticsRepository
 from app.events.analytics_observer import AnalyticsObserver
 from app.events.click_event import ClickEvent
 from app.events.publisher import ClickEventPublisher
+
 
 class URLService:
     """
@@ -37,8 +36,9 @@ class URLService:
         self.click_publisher.subscribe(
             AnalyticsObserver(db)
         )
+
     # Generate Short Code
-    
+
     def _generate_short_code(
         self,
         length: int = 6,
@@ -49,9 +49,8 @@ class URLService:
 
         return secrets.token_urlsafe(length)[:length]
 
-    
     # Create Short URL
-   
+
     def create_url(
         self,
         url_data: URLCreate,
@@ -82,20 +81,47 @@ class URLService:
 
         return URLResponse.model_validate(url)
 
-    # Get URL
-    
+    # Get URL By Short Code
+
     def get_url(
         self,
         short_code: str,
     ) -> ShortURL:
 
-        url = self.url_repository.get_by_short_code(short_code)
+        url = self.url_repository.get_by_short_code(
+            short_code
+        )
 
         if not url:
             raise ValueError("URL not found.")
 
         return url
-    
+
+    # Get URL By ID
+
+    def get_url_by_id(
+        self,
+        url_id: int,
+        user_id: int,
+    ) -> URLResponse:
+        """
+        Get URL details by ID.
+
+        Only the owner of the URL can view its details.
+        """
+
+        url = self.url_repository.get_by_id(url_id)
+
+        if not url:
+            raise ValueError("URL not found.")
+
+        if url.user_id != user_id:
+            raise PermissionError(
+                "You are not authorized to view this URL."
+            )
+
+        return URLResponse.model_validate(url)
+
     # List URLs
 
     def list_urls(
@@ -110,7 +136,9 @@ class URLService:
     ) -> tuple[list[URLResponse], int]:
 
         if page < 1:
-            raise ValueError("Page number must be greater than 0.")
+            raise ValueError(
+                "Page number must be greater than 0."
+            )
 
         if page_size < 1 or page_size > 100:
             raise ValueError(
@@ -144,14 +172,16 @@ class URLService:
                 "Sort order must be asc or desc."
             )
 
-        urls, total = self.url_repository.get_by_user_paginated(
-            user_id=user_id,
-            page=page,
-            page_size=page_size,
-            search=search,
-            status=status,
-            sort_by=sort_by,
-            sort_order=sort_order,
+        urls, total = (
+            self.url_repository.get_by_user_paginated(
+                user_id=user_id,
+                page=page,
+                page_size=page_size,
+                search=search,
+                status=status,
+                sort_by=sort_by,
+                sort_order=sort_order,
+            )
         )
 
         return (
@@ -160,9 +190,10 @@ class URLService:
                 for url in urls
             ],
             total,
-        )   
+        )
 
     # Update URL
+
     def update_url(
         self,
         url_id: int,
@@ -179,9 +210,11 @@ class URLService:
             raise PermissionError(
                 "You are not authorized to update this URL."
             )
-    
+
         if url_data.original_url:
-            url.original_url = str(url_data.original_url)
+            url.original_url = str(
+                url_data.original_url
+            )
 
         if url_data.expires_at:
             url.expires_at = url_data.expires_at
@@ -190,8 +223,8 @@ class URLService:
 
         return URLResponse.model_validate(updated)
 
-   
     # Delete URL
+
     def delete_url(
         self,
         url_id: int,
@@ -207,11 +240,11 @@ class URLService:
             raise PermissionError(
                 "You are not authorized to delete this URL."
             )
-    
+
         self.url_repository.delete(url)
 
     # Increment Click Count
-    
+
     def increment_clicks(
         self,
         short_code: str,

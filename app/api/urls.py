@@ -124,9 +124,78 @@ def list_urls(
             detail=str(exc),
         )
 
+# Enable URL
+
+@router.patch(
+    "/{url_id}/enable",
+    response_model=URLResponse,
+)
+def enable_url(
+    url_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Enable a shortened URL.
+    """
+
+    service = URLService(db)
+
+    try:
+        return service.enable_url(
+            url_id=url_id,
+            user_id=current_user.id,
+        )
+
+    except PermissionError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=str(exc),
+        )
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        )
+
+
+# Disable URL
+
+@router.patch(
+    "/{url_id}/disable",
+    response_model=URLResponse,
+)
+def disable_url(
+    url_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Disable a shortened URL.
+    """
+
+    service = URLService(db)
+
+    try:
+        return service.disable_url(
+            url_id=url_id,
+            user_id=current_user.id,
+        )
+
+    except PermissionError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=str(exc),
+        )
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        )
 
 # Get URL Details By ID
-
 @router.get(
     "/{url_id}",
     response_model=URLResponse,
