@@ -40,11 +40,11 @@ def test_get_analytics():
 
     # Visit short URL -> generates click event
     click_response = client.get(
-        f"/urls/{short_code}",
+        f"/{short_code}",
         follow_redirects=False,
     )
 
-    assert click_response.status_code == 307
+    assert click_response.status_code == 302
 
     # Get analytics
     response = client.get(

@@ -13,7 +13,7 @@ from app.api.analytics import router as analytics_router
 from app.api.dashboard import router as dashboard_router
 from app.exceptions.handlers import register_exception_handlers
 from app.middleware.logging import LoggingMiddleware
-
+from app.api.redirect import router as redirect_router
 
 app = FastAPI(
     title="URL Shortener Service",
@@ -51,3 +51,4 @@ app.include_router(auth_router)
 app.include_router(url_router)
 app.include_router(analytics_router)
 app.include_router(dashboard_router)
+app.include_router(redirect_router)
