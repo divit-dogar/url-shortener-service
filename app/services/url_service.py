@@ -95,6 +95,72 @@ class URLService:
             raise ValueError("URL not found.")
 
         return url
+    
+    # List URLs
+
+    def list_urls(
+        self,
+        user_id: int,
+        page: int = 1,
+        page_size: int = 10,
+        search: str | None = None,
+        status: str | None = None,
+        sort_by: str = "created_at",
+        sort_order: str = "desc",
+    ) -> tuple[list[URLResponse], int]:
+
+        if page < 1:
+            raise ValueError("Page number must be greater than 0.")
+
+        if page_size < 1 or page_size > 100:
+            raise ValueError(
+                "Page size must be between 1 and 100."
+            )
+
+        allowed_statuses = {
+            "active",
+            "disabled",
+            "expired",
+        }
+
+        if status and status not in allowed_statuses:
+            raise ValueError(
+                "Status must be active, disabled, or expired."
+            )
+
+        allowed_sort_fields = {
+            "created_at",
+            "click_count",
+            "expires_at",
+        }
+
+        if sort_by not in allowed_sort_fields:
+            raise ValueError(
+                "Invalid sort field."
+            )
+
+        if sort_order.lower() not in {"asc", "desc"}:
+            raise ValueError(
+                "Sort order must be asc or desc."
+            )
+
+        urls, total = self.url_repository.get_by_user_paginated(
+            user_id=user_id,
+            page=page,
+            page_size=page_size,
+            search=search,
+            status=status,
+            sort_by=sort_by,
+            sort_order=sort_order,
+        )
+
+        return (
+            [
+                URLResponse.model_validate(url)
+                for url in urls
+            ],
+            total,
+        )   
 
     # Update URL
     def update_url(

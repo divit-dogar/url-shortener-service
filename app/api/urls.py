@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.dependencies import get_current_user
 from app.models import User
-from app.schemas import URLCreate, URLResponse, URLUpdate
+from app.schemas import URLCreate, URLListResponse, URLResponse, URLUpdate
 from app.services.url_service import URLService
 from fastapi import Request
 from fastapi.responses import RedirectResponse
@@ -49,6 +49,62 @@ def create_url(
             detail=str(exc),
         )
 
+@router.get(
+    "",
+    response_model=URLListResponse,
+)
+def list_urls(
+    page: int = 1,
+    page_size: int = 10,
+    search: str | None = None,
+    status: str | None = None,
+    sort_by: str = "created_at",
+    sort_order: str = "desc",
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    List URLs belonging to the current user.
+
+    Supports:
+    - Search
+    - Status filtering
+    - Sorting
+    - Pagination
+    """
+
+    service = URLService(db)
+
+    try:
+        urls, total = service.list_urls(
+            user_id=current_user.id,
+            page=page,
+            page_size=page_size,
+            search=search,
+            status=status,
+            sort_by=sort_by,
+            sort_order=sort_order,
+        )
+
+        total_pages = (
+            (total + page_size - 1) // page_size
+            if total > 0
+            else 0
+        )
+
+        return URLListResponse(
+            items=urls,
+            page=page,
+            page_size=page_size,
+            total=total,
+            total_pages=total_pages,
+        )
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
 
 @router.get(
     "/{short_code}/qr",
