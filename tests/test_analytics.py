@@ -52,8 +52,11 @@ def test_get_analytics():
         headers=headers,
     )
 
-    assert response.status_code == 200
+    print("ANALYTICS STATUS:", response.status_code)
+    print("ANALYTICS RESPONSE:", response.json())
 
+    assert response.status_code == 200
+    
     data = response.json()
 
     assert data["short_code"] == short_code
