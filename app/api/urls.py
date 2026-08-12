@@ -15,7 +15,7 @@ from app.services.url_service import URLService
 from fastapi import Request
 from fastapi.responses import RedirectResponse
 from fastapi.responses import RedirectResponse, StreamingResponse
-
+from app.core.config import settings
 from app.services.qr_code_service import QRCodeService
 
 router = APIRouter(
@@ -72,7 +72,7 @@ def generate_qr_code(
         )
 
     short_url = (
-        f"http://127.0.0.1:8000/urls/{url.short_code}"
+        f"{settings.BASE_URL}/urls/{url.short_code}"
     )
 
     qr_service = QRCodeService()

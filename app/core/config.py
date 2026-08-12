@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     APP_NAME: str
     APP_ENV: str
     DEBUG: bool
-
+    BASE_URL: str
    
     # Database
    
