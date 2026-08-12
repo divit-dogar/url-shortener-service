@@ -1,8 +1,6 @@
 """
 URL Schemas
 
-Purpose
--------
 Contains request and response schemas
 related to URL shortening operations.
 """
@@ -10,7 +8,6 @@ related to URL shortening operations.
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
-
 
 
 # Create Short URL
@@ -27,7 +24,7 @@ class URLCreate(BaseModel):
         default=None,
         min_length=3,
         max_length=20,
-        description="Optional custom short code"
+        description="Optional custom alias",
     )
 
     expires_at: datetime | None = None
@@ -46,7 +43,6 @@ class URLUpdate(BaseModel):
     expires_at: datetime | None = None
 
 
-
 # URL Response
 
 class URLResponse(BaseModel):
@@ -56,23 +52,36 @@ class URLResponse(BaseModel):
     """
 
     id: int
-
     original_url: HttpUrl
-
     short_code: str
-
+    custom_alias: str | None = None
     click_count: int
-
-    expires_at: datetime | None
-
+    expires_at: datetime | None = None
+    is_active: bool
     created_at: datetime
+    updated_at: datetime
 
     model_config = ConfigDict(
-        from_attributes=True
+        from_attributes=True,
     )
 
 
-# URL Analytics
+# URL List Response
+
+class URLListResponse(BaseModel):
+    """
+    Paginated response for listing URLs.
+    """
+
+    items: list[URLResponse]
+
+    page: int
+    page_size: int
+    total: int
+    total_pages: int
+
+
+# URL Analytics / Statistics
 
 class URLStats(BaseModel):
     """
@@ -81,9 +90,6 @@ class URLStats(BaseModel):
     """
 
     short_code: str
-
     total_clicks: int
-
     created_at: datetime
-
-    expires_at: datetime | None
+    expires_at: datetime | None = None
