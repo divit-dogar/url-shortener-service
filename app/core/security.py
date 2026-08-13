@@ -7,7 +7,7 @@ JWT creation, and JWT verification.
 
 from datetime import datetime, timedelta, timezone
 from typing import Any
-
+import uuid
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
@@ -106,6 +106,7 @@ def create_refresh_token(
     payload: dict[str, Any] = {
         "sub": subject,
         "type": "refresh",
+        "jti": str(uuid.uuid4()),
         "exp": expire,
     }
 
@@ -124,7 +125,9 @@ def decode_access_token(
     """
     Decode and verify a JWT token.
 
-    Raises JWTError if invalid or expired.
+    Raises:
+        JWTError: If the token is invalid
+        or expired.
     """
 
     return jwt.decode(
