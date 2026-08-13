@@ -8,7 +8,7 @@ def test_get_analytics():
     # Login
     login = client.post(
         "/auth/login",
-        data={
+        json={
             "username": "test@example.com",
             "password": "Password@123",
         },

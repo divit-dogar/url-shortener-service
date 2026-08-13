@@ -4,12 +4,12 @@ import uuid
 def test_create_url():
 
     login = client.post(
-        "/auth/login",
-        data={
-            "username": "test@example.com",
-            "password": "Password@123",
-        },
-    )
+    "/auth/login",
+    json={
+        "username": "test@example.com",
+        "password": "Password@123",
+    },
+)
 
     token = login.json()["access_token"]
 

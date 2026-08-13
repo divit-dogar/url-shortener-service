@@ -5,7 +5,7 @@ def test_dashboard():
 
     login = client.post(
         "/auth/login",
-        data={
+        json={
             "username": "test@example.com",
             "password": "Password@123",
         },

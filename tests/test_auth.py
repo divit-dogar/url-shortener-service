@@ -19,7 +19,7 @@ def test_login():
 
     response = client.post(
         "/auth/login",
-        data={
+        json={
             "username": "test@example.com",
             "password": "Password@123",
         },
