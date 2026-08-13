@@ -231,15 +231,78 @@ class URLService:
                 "You are not authorized to update this URL."
             )
 
-        if url_data.original_url:
+        # Update original URL
+        if url_data.original_url is not None:
             url.original_url = str(
                 url_data.original_url
             )
 
-        if url_data.expires_at:
+        # Update custom alias
+        if url_data.custom_alias is not None:
+            existing_alias = (
+                self.url_repository.get_by_custom_alias(
+                    url_data.custom_alias
+                )
+            )
+
+            if (
+               existing_alias
+                and existing_alias.id != url.id
+            ):
+                raise ValueError(
+                    "Custom alias already exists."
+                )
+
+            url.custom_alias = url_data.custom_alias
+
+        # Update expiration date
+        if url_data.expires_at is not None:
             url.expires_at = url_data.expires_at
 
         updated = self.url_repository.update(url)
+
+        return URLResponse.model_validate(updated)
+        # Enable URL
+
+    def enable_url(
+        self,
+        url_id: int,
+        user_id: int,
+    ) -> URLResponse:
+
+        url = self.url_repository.get_by_id(url_id)
+
+        if not url:
+            raise ValueError("URL not found.")
+
+        if url.user_id != user_id:
+            raise PermissionError(
+                "You are not authorized to enable this URL."
+            )
+
+        updated = self.url_repository.enable(url)
+
+        return URLResponse.model_validate(updated)
+
+    # Disable URL
+
+    def disable_url(
+        self,
+        url_id: int,
+        user_id: int,
+    ) -> URLResponse:
+
+        url = self.url_repository.get_by_id(url_id)
+
+        if not url:
+            raise ValueError("URL not found.")
+
+        if url.user_id != user_id:
+            raise PermissionError(
+                "You are not authorized to disable this URL."
+            )
+
+        updated = self.url_repository.disable(url)
 
         return URLResponse.model_validate(updated)
 

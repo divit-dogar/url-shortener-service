@@ -40,6 +40,13 @@ class URLUpdate(BaseModel):
 
     original_url: HttpUrl | None = None
 
+    custom_alias: str | None = Field(
+        default=None,
+        min_length=3,
+        max_length=20,
+        description="Optional custom alias",
+    )
+
     expires_at: datetime | None = None
 
 
