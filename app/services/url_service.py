@@ -81,9 +81,11 @@ class URLService:
         short_code = self._generate_short_code()
 
         # Ensure generated short code is unique
+        print("Dogar",self.url_repository.get_by_short_code(short_code))
         while self.url_repository.get_by_short_code(
             short_code
         ):
+            print("while loop eexecuted")
             short_code = self._generate_short_code()
 
         # Create database object
@@ -328,34 +330,43 @@ class URLService:
 
     # Increment Click Count
 
-    def increment_clicks(
-        self,
-        short_code: str,
-        ip_address: str | None = None,
-        user_agent: str | None = None,
-        referrer: str | None = None,
-    ) -> None:
+    # Increment Click Count
 
-        url = self.url_repository.get_by_short_code(
-            short_code
-        )
+def increment_clicks(
+    self,
+    short_code: str,
+    ip_address: str | None = None,
+    user_agent: str | None = None,
+    browser: str | None = None,
+    operating_system: str | None = None,
+    device: str | None = None,
+    referrer: str | None = None,
+) -> None:
 
-        if not url:
-            raise ValueError("URL not found.")
+    url = self.url_repository.get_by_short_code(
+        short_code
+    )
 
-        # Increment total click count
-        self.url_repository.increment_click_count(
-            url
-        )
+    if not url:
+        raise ValueError("URL not found.")
 
-        # Create click event
-        event = ClickEvent(
-            short_url_id=url.id,
-            short_code=url.short_code,
-            ip_address=ip_address,
-            user_agent=user_agent,
-            referrer=referrer,
-        )
+    # Increment total click count
+    self.url_repository.increment_click_count(
+        url
+    )
 
-        # Notify observers
-        self.click_publisher.notify(event)
+    # Create click event
+    event = ClickEvent(
+        short_url_id=url.id,
+        short_code=url.short_code,
+        ip_address=ip_address,
+        user_agent=user_agent,
+        browser=browser,
+        operating_system=operating_system,
+        device=device,
+        referrer=referrer,
+    )
+
+    # Notify observers
+    self.click_publisher.notify(event)
+       
