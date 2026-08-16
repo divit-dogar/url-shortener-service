@@ -7,9 +7,10 @@ from app.repositories import AnalyticsRepository
 
 
 class AnalyticsObserver(ClickObserver):
-    
-    # Stores click events in the analytics database.
-    
+    """
+    Stores click events in the analytics database.
+    """
+
     def __init__(self, db: Session):
         self.analytics_repository = AnalyticsRepository(db)
 
@@ -19,6 +20,9 @@ class AnalyticsObserver(ClickObserver):
             short_url_id=event.short_url_id,
             ip_address=event.ip_address,
             user_agent=event.user_agent,
+            browser=event.browser,
+            operating_system=event.operating_system,
+            device=event.device,
             referrer=event.referrer,
         )
 
