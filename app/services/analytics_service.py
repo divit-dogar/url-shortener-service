@@ -32,10 +32,8 @@ class AnalyticsService:
         short_code: str,
         user_id: int,
     ) -> dict:
-       
-       # Return analytics for a short URL.
-        
 
+        # Get URL
         url = self.url_repository.get_by_short_code(
             short_code
         )
@@ -44,17 +42,42 @@ class AnalyticsService:
             raise ValueError(
                 "URL not found."
             )
+
+        # Check ownership
         if url.user_id != user_id:
             raise PermissionError(
                 "You are not authorized to view this analytics."
             )
 
+        # Total clicks
         total_clicks = (
             self.analytics_repository.get_total_clicks(
                 url.id
             )
         )
 
+        # Unique visitors
+        unique_visitors = (
+            self.analytics_repository.get_unique_visitors(
+                url.id
+            )
+        )
+
+        # Daily click count
+        daily_click_count = (
+            self.analytics_repository.get_daily_click_count(
+                url.id
+            )
+        )
+
+        # Last access time
+        last_access_time = (
+            self.analytics_repository.get_last_access_time(
+                url.id
+            )
+        )
+
+        # Click history
         click_history = (
             self.analytics_repository.get_by_short_url(
                 url.id
@@ -65,5 +88,10 @@ class AnalyticsService:
             "short_code": url.short_code,
             "original_url": url.original_url,
             "total_clicks": total_clicks,
+            "unique_visitors": unique_visitors,
+            "daily_click_count": daily_click_count,
+            "last_access_time": last_access_time,
             "click_history": click_history,
         }
+    
+    

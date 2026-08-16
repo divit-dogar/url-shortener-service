@@ -37,9 +37,16 @@ def get_url_analytics(
         return service.get_url_analytics(
             short_code=short_code,
             user_id=current_user.id,
-            )
+        )
+
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        )
+
+    except PermissionError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
             detail=str(exc),
         )
