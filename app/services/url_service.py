@@ -330,43 +330,42 @@ class URLService:
 
     # Increment Click Count
 
-    # Increment Click Count
 
-def increment_clicks(
-    self,
-    short_code: str,
-    ip_address: str | None = None,
-    user_agent: str | None = None,
-    browser: str | None = None,
-    operating_system: str | None = None,
-    device: str | None = None,
-    referrer: str | None = None,
-) -> None:
+    def increment_clicks(
+        self,
+        short_code: str,
+        ip_address: str | None = None,
+        user_agent: str | None = None,
+        browser: str | None = None,
+        operating_system: str | None = None,
+        device: str | None = None,
+        referrer: str | None = None,
+    ) -> None:
 
-    url = self.url_repository.get_by_short_code(
-        short_code
-    )
+        url = self.url_repository.get_by_short_code(
+            short_code
+        )
 
-    if not url:
-        raise ValueError("URL not found.")
+        if not url:
+            raise ValueError("URL not found.")
 
-    # Increment total click count
-    self.url_repository.increment_click_count(
-        url
-    )
+        # Increment total click count
+        self.url_repository.increment_click_count(
+            url
+        )
 
-    # Create click event
-    event = ClickEvent(
-        short_url_id=url.id,
-        short_code=url.short_code,
-        ip_address=ip_address,
-        user_agent=user_agent,
-        browser=browser,
-        operating_system=operating_system,
-        device=device,
-        referrer=referrer,
-    )
+        # Create click event
+        event = ClickEvent(
+            short_url_id=url.id,
+            short_code=url.short_code,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            browser=browser,
+            operating_system=operating_system,
+            device=device,
+            referrer=referrer,
+        )
 
-    # Notify observers
-    self.click_publisher.notify(event)
+        # Notify observers
+        self.click_publisher.notify(event)
        

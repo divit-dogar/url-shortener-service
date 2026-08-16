@@ -255,7 +255,7 @@ def generate_qr_code(
         )
 
     short_url = (
-        f"{settings.BASE_URL}/urls/{url.short_code}"
+        f"{settings.BASE_URL}/{url.short_code}"
     )
 
     qr_service = QRCodeService()
