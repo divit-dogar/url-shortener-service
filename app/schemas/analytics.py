@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 
 from pydantic import BaseModel
 
@@ -17,8 +17,16 @@ class ClickAnalyticsResponse(BaseModel):
     }
 
 
+class DailyClickResponse(BaseModel):
+    date: date
+    clicks: int
+
+
 class URLAnalyticsResponse(BaseModel):
     short_code: str
     original_url: str
     total_clicks: int
+    unique_visitors: int
+    daily_click_count: list[DailyClickResponse]
+    last_access_time: datetime | None = None
     click_history: list[ClickAnalyticsResponse]
